@@ -15,7 +15,6 @@ const contactContent = "Scelerisque eleifend donec pretium vulputate sapien. Rho
 
 // connection
 mongoose.connect("mongodb://localhost:27017/blogDB", {useNewUrlParser: true});
-
 const postSchema = {
   title: String,
   content: String 
@@ -32,8 +31,6 @@ app.use(express.static("public"));
 // rendering ejs files 
 app.get("/",function(req,res){
   res.render("home.ejs",{homeContent:homeStartingContent,posts:posts});
-
-  
 });
 
 app.get("/about",function(req,res){
@@ -50,12 +47,12 @@ app.get("/compose",function(req,res){
 
 app.post("/compose",function(req,res){
 
-  const post = {
+  const post = new Post({
     title: req.body.title,
     content: req.body.content
-  };
+  });
 
-  posts.push(post);
+  post.save();
 
   res.redirect("/");
 });
@@ -72,7 +69,7 @@ app.get("/posts/:routeParameter",function(req,res){
         title: i_post.title,
         body: i_post.content
       };
-      console.log(post);
+      // console.log(post);
       res.render("post.ejs",{title:post.title,content:post.body});
     }
   });
