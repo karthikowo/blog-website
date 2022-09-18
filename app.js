@@ -1,5 +1,4 @@
 //jshint esversion:6
-let posts = [];
 const _ = require('lodash');
 
 // packages 
@@ -30,7 +29,16 @@ app.use(express.static("public"));
 
 // rendering ejs files 
 app.get("/",function(req,res){
-  res.render("home.ejs",{homeContent:homeStartingContent,posts:posts});
+  // res.render("home.ejs",{homeContent:homeStartingContent,posts:posts});
+  Post.find({}, function(err, posts){
+
+    res.render("home.ejs", {
+      homeContent: homeStartingContent,
+      posts: posts
+      });
+  })
+ 
+ 
 });
 
 app.get("/about",function(req,res){
@@ -52,26 +60,25 @@ app.post("/compose",function(req,res){
     content: req.body.content
   });
 
+  // post.save(function(err){
+  //   if (!err){
+  //     res.redirect("/");
+  //   }
+  // }); 
   post.save();
 
   res.redirect("/");
 });
 
-app.get("/posts/:routeParameter",function(req,res){
+app.get("/posts/:postId",function(req,res){
   // const obj = req.params;
   // console.log(obj.par);(
-  const requestedTitle = _.lowerCase(req.params.routeParameter);
-  posts.forEach(function(i_post){
-    const storedTitle = _.lowerCase(i_post.title);
-
-    if (storedTitle === requestedTitle){
-      const post ={
-        title: i_post.title,
-        body: i_post.content
-      };
-      // console.log(post);
-      res.render("post.ejs",{title:post.title,content:post.body});
-    }
+  const requestedPostId = req.params.postId;
+  Post.findOne({_id: requestedPostId}, function(err, post){ 
+    res.render("post", {
+      title: post.title,
+      content: post.content
+    });
   });
   
 });
