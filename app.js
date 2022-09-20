@@ -6,6 +6,8 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const ejs = require("ejs");
 const mongoose = require('mongoose');
+const dotenv = require('dotenv');
+dotenv.config();
 
 // lorem ipsum 
 const homeStartingContent = "Welcome to my public-diary , this is my space to share my thoughts. This was a satisfying experience to work in this than I thought it'd be, also a self confidence boost for me.";
@@ -13,7 +15,7 @@ const aboutContent = "Hac habitasse platea dictumst vestibulum rhoncus est pelle
 const contactContent = "Scelerisque eleifend donec pretium vulputate sapien. Rhoncus urna neque viverra justo nec ultrices. Arcu dui vivamus arcu felis bibendum. Consectetur adipiscing elit duis tristique. Risus viverra adipiscing at in tellus integer feugiat. Sapien nec sagittis aliquam malesuada bibendum arcu vitae. Consequat interdum varius sit amet mattis. Iaculis nunc sed augue lacus. Interdum posuere lorem ipsum dolor sit amet consectetur adipiscing elit. Pulvinar elementum integer enim neque. Ultrices gravida dictum fusce ut placerat orci nulla. Mauris in aliquam sem fringilla ut morbi tincidunt. Tortor posuere ac ut consequat semper viverra nam libero.";
 
 // connection
-mongoose.connect("mongodb://localhost:27017/blogDB", {useNewUrlParser: true});
+mongoose.connect(process.env.DATABASE_URL, {useNewUrlParser: true});
 const postSchema = {
   title: String,
   content: String 
@@ -83,7 +85,19 @@ app.get("/posts/:postId",function(req,res){
   
 });
 
+app.get("/posts/delete/:postId",function(req,res){
+  const requestedPostId = req.params.postId;
+
+  Post.findOneAndDelete({_id: requestedPostId}, function(err, post){ 
+    res.render("post", {
+      title: post.title,
+      content: post.content
+    });
+  });
+
+  res.redirect("/");
+});
 // hosting port 
-app.listen(3000, function() {
-  console.log("Server started on port 3000");
+app.listen(process.env.PORT, function() {
+  console.log(`Server started on  ${process.env.PORT}`);
 });
